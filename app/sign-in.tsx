@@ -1,5 +1,6 @@
 import { getTheme, Spacing, Typography } from "@/constants/theme";
 import { useHapticFeedback } from "@/hooks/useHaptics";
+import { customAlert } from "@/store/alertStore";
 import { useAuthStore } from "@/store/authStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,26 +8,28 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   LayoutAnimation,
-  Modal,
+  LogBox,
   Platform,
   Pressable,
   ScrollView,
   Text,
   TextInput,
   UIManager,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 if (
   Platform.OS === "android" &&
   UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
-
+) 
+  try {
+      // @ts-ignore
+      if (!global.nativeFabricUIManager) {
+        UIManager.setLayoutAnimationEnabledExperimental(true);
+      }
+  }catch{}
 export default function SignInScreen() {
   const router = useRouter();
   const haptics = useHapticFeedback();
@@ -40,7 +43,6 @@ export default function SignInScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
-  const [showForgotAlert, setShowForgotAlert] = useState(false);
 
   const login = useAuthStore((state) => state.login);
   const signup = useAuthStore((state) => state.signup);
@@ -67,7 +69,7 @@ export default function SignInScreen() {
       router.replace("/(tabs)");
     } catch (error) {
       haptics.warning();
-      Alert.alert(
+      customAlert(
         "Sign In Failed",
         error instanceof Error ? error.message : "Please try again",
       );
@@ -76,14 +78,18 @@ export default function SignInScreen() {
 
   const handleForgotPassword = () => {
     haptics.lightTap();
-    setShowForgotAlert(true);
+    customAlert(
+      "Forgot Password",
+      "An email will be sent on the registered email id.",
+      [{ text: "Got it" }],
+    );
   };
   const handleSignUp = async () => {
     haptics.mediumTap();
 
     if (password !== confirmPassword) {
       haptics.warning();
-      Alert.alert("Error", "Passwords do not match");
+      customAlert("Error", "Passwords do not match");
       return;
     }
 
@@ -92,7 +98,7 @@ export default function SignInScreen() {
       router.replace("/(tabs)");
     } catch (error) {
       haptics.warning();
-      Alert.alert(
+      customAlert(
         "Sign Up Failed",
         error instanceof Error ? error.message : "Please try again",
       );
@@ -379,12 +385,21 @@ export default function SignInScreen() {
                     disabled={isLoading}
                     style={{ padding: 4 }}
                   >
-                    {/* Eye Icon */}
-                    <Ionicons
-                      name={showPassword ? "eye-off" : "eye"}
-                      size={20}
-                      color="#9ca3af"
-                    />
+                    {({ pressed }) => (
+                      <Ionicons
+                        name={
+                          showPassword
+                            ? pressed
+                              ? "eye-off-sharp"
+                              : "eye-off-outline"
+                            : pressed
+                              ? "eye-sharp"
+                              : "eye-outline"
+                        }
+                        size={20}
+                        color="#9ca3af"
+                      />
+                    )}
                   </Pressable>
                 </View>
               </View>
@@ -439,11 +454,21 @@ export default function SignInScreen() {
                       disabled={isLoading}
                       style={{ padding: 4 }}
                     >
-                      <Ionicons
-                        name={showConfirmPassword ? "eye-off" : "eye"}
-                        size={20}
-                        color="#9ca3af"
-                      />
+                      {({ pressed }) => (
+                        <Ionicons
+                          name={
+                            showConfirmPassword
+                              ? pressed
+                                ? "eye-off-sharp"
+                                : "eye-off-outline"
+                              : pressed
+                                ? "eye-sharp"
+                                : "eye-outline"
+                          }
+                          size={20}
+                          color="#9ca3af"
+                        />
+                      )}
                     </Pressable>
                   </View>
                 </View>
@@ -512,90 +537,6 @@ export default function SignInScreen() {
           </View>
         </View>
       </ScrollView>
-
-      {/* Forgot Password Animated Modal */}
-      <Modal
-        visible={showForgotAlert}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowForgotAlert(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.6)",
-          }}
-        >
-          <View
-            style={{
-              width: "80%",
-              backgroundColor: "#1c1c1e",
-              borderRadius: 20,
-              padding: Spacing.xl,
-              borderWidth: 1,
-              borderColor: "#2c2c2e",
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 4,
-              },
-              shadowOpacity: 0.5,
-              shadowRadius: 10,
-              elevation: 8,
-            }}
-          >
-            <Text
-              style={{
-                ...Typography.title,
-                fontSize: 20,
-                fontWeight: "700",
-                textAlign: "center",
-                marginBottom: Spacing.sm,
-                color: "#ffffff",
-              }}
-            >
-              Forgot Password
-            </Text>
-            <Text
-              style={{
-                ...Typography.body,
-                color: "#d1d5db",
-                textAlign: "center",
-                marginBottom: Spacing.xl,
-              }}
-            >
-              An email will be sent on the registered email id.
-            </Text>
-
-            <Pressable
-              onPress={() => {
-                haptics.lightTap();
-                setShowForgotAlert(false);
-              }}
-              style={({ pressed }) => ({
-                backgroundColor: "#ffffff",
-                paddingVertical: Spacing.md,
-                borderRadius: 10,
-                alignItems: "center",
-                opacity: pressed ? 0.8 : 1,
-              })}
-            >
-              <Text
-                style={{
-                  ...Typography.label,
-                  color: "#0a0a0a",
-                  fontSize: 15,
-                  fontWeight: "600",
-                }}
-              >
-                Got it
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
