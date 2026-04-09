@@ -1,50 +1,67 @@
-# Welcome to your Expo app 👋
+# PayU 💸
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+PayU is a modern, beautifully designed personal finance and expense tracking application built with React Native and Expo. Manage your income, track your daily expenses, and visualize your financial analytics seamlessly on both iOS and Android.
 
-## Get started
+## ✨ Features
 
-1. Install dependencies
+- **Transaction Management**: Add, edit, and delete daily income and expense transactions.
+- **Smart Analytics**: Visualize your monthly spending habits with interactive bar charts and data summaries.
+- **Dynamic Theming**: Full support for both Light and Dark modes with responsive contrast, typography, and dynamic shadow elevations.
+- **Categorization**: Built-in and customizable categories to group your financial activities.
+- **Local Persistence**: Fast and reliable state management using Zustand with local storage hydration.
+- **Accessibility**: Screen-reader friendly components, semantic labels, and focus states for inclusive usability.
+- **Haptic Feedback**: Meaningful tactile responses for primary actions, success states, and warnings.
 
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/en/)
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- iOS Simulator or Android Emulator (or a physical device with the [Expo Go](https://expo.dev/go) app)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/RahulKeshri1/PayU.git
+   cd PayU
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. **Start the development server**
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## 🛠 Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Framework**: [React Native](https://reactnative.dev/) & [Expo](https://expo.dev/)
+- **Routing**: [Expo Router](https://docs.expo.dev/router/introduction/) (File-based routing)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Icons**: [Ionicons](https://ionic.io/ionicons)
+- **Date Parsing**: [date-fns](https://date-fns.org/)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 📱 Project Structure
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```text
+app/                 # Expo Router screens and layouts
+  (tabs)/            # Bottom tab navigation (Home, Analytics, Transactions, Profile)
+components/          # Reusable UI components (Header, CustomAlert, etc.)
+constants/           # Theme definitions, colors, typography, and layouts
+hooks/               # Custom React hooks (useHaptics, useTheme, etc.)
+store/               # Zustand state stores (auth, transactions, categories, etc.)
+utils/               # Utility functions for date parsing, currency formatting, etc.
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🤝 Contributing
 
-## Learn more
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/RahulKeshri1/PayU/issues).
 
-To learn more about developing your project with Expo, look at the following resources:
+## 📄 License
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This project is licensed under the MIT License.
