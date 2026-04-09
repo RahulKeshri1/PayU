@@ -431,7 +431,7 @@ export default function HomeScreen() {
                           expensePeriod === "weekly"
                             ? "last week"
                             : "last month";
-                        if (!item.pastTotal) return `No data from ${periodStr}`;
+                        if (!item.pastTotal) return `Transactions from ${periodStr}`;
 
                         const diff = item.total - item.pastTotal;
                         if (diff === 0) return `Same as ${periodStr}`;

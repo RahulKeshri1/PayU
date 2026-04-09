@@ -12,7 +12,22 @@ PayU is a modern, beautifully designed personal finance and expense tracking app
 - **Accessibility**: Screen-reader friendly components, semantic labels, and focus states for inclusive usability.
 - **Haptic Feedback**: Meaningful tactile responses for primary actions, success states, and warnings.
 
-## 🚀 Getting Started
+## 📸 Screenshots
+
+<p align="center">
+  <img src="assets/images/ScreenShots/SignIn.png" width="45%" />
+  <img src="assets/images/ScreenShots/SignUp.png" width="45%" />
+</p>
+<p align="center">
+  <img src="assets/images/ScreenShots/Home.png" width="45%" />
+  <img src="assets/images/ScreenShots/Transactions.png" width="45%" />
+</p>
+<p align="center">
+  <img src="assets/images/ScreenShots/AddTransaction.png" width="45%" />
+  <img src="assets/images/ScreenShots/Profile.png" width="45%" />
+</p>
+
+## �🚀 Getting Started
 
 ### Prerequisites
 
@@ -23,12 +38,14 @@ PayU is a modern, beautifully designed personal finance and expense tracking app
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/RahulKeshri1/PayU.git
    cd PayU
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
