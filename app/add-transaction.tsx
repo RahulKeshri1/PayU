@@ -38,6 +38,7 @@ export default function AddTransactionModal() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Reset category when type changes
   useEffect(() => {
@@ -91,21 +92,23 @@ export default function AddTransactionModal() {
       haptics.success();
       router.back();
     } catch (error) {
-      // Assuming a generic error haptic or just warning for failure
       haptics.warning();
+      setSubmitError(error instanceof Error ? error.message : "Failed to add transaction");
     }
   };
 
-  const handleDateChange = (event: any, date: Date) => {
-    setShowDatePicker(Platform.OS === "ios");
-    if (date) {
-      setSelectedDate(date);
-    }
-  };
-
-  const handleDismiss = () => {
-    setShowDatePicker(false);
-  };
+  const handleDateChange = (event: any, date?: Date) => {
+      if (Platform.OS === "android") {
+        setShowDatePicker(false);
+      }
+      if (event.type === "dismissed") {
+        setShowDatePicker(false);
+        return;
+      }
+      if (date) {
+        setSelectedDate(date);
+      }
+    };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -423,8 +426,7 @@ export default function AddTransactionModal() {
                 mode="date"
                 maximumDate={new Date()}
                 display={Platform.OS === "ios" ? "spinner" : "default"}
-                onValueChange={handleDateChange}
-                onDismiss={handleDismiss}
+                onChange={handleDateChange}
               />
             )}
           </View>

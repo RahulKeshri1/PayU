@@ -8,7 +8,7 @@ export default function CustomAlert() {
   const { visible, title, message, buttons, hideAlert } = useAlertStore();
   const haptics = useHapticFeedback();
 
-  if (!visible) return null;
+  // Match signin dark alert theme
 
   // Match signin dark alert theme
   const containerBg = "#1c1c1e";

@@ -6,30 +6,22 @@ import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  LayoutAnimation,
-  LogBox,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  UIManager,
-  View,
-} from "react-native";
+import { ActivityIndicator, LayoutAnimation, Platform, Pressable, ScrollView, Text, TextInput, UIManager, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 if (
   Platform.OS === "android" &&
   UIManager.setLayoutAnimationEnabledExperimental
-) 
+) {
   try {
       // @ts-ignore
       if (!global.nativeFabricUIManager) {
         UIManager.setLayoutAnimationEnabledExperimental(true);
       }
-  }catch{}
+  } catch {
+    // Ignored: setLayoutAnimationEnabledExperimental may throw on some Android versions
+  }
+}
 export default function SignInScreen() {
   const router = useRouter();
   const haptics = useHapticFeedback();

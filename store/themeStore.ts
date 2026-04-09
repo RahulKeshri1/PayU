@@ -33,13 +33,26 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       const storedMode = await storage.getItem("theme_mode");
       const storedCurrency = await storage.getItem("currency");
 
-      set({
-        mode: (storedMode as ThemeMode) || "dark",
-        currency: storedCurrency || "₹",
-        error: null,
-      });
+const isValidThemeMode = (value: unknown): value is ThemeMode =>
+  value === "light" || value === "dark";
+
+// Load theme preference from storage
+loadTheme: async () => {
+  set({ isLoading: true });
+  try {
+    const storedMode = await storage.getItem("theme_mode");
+    const storedCurrency = await storage.getItem("currency");
+
+    set({
+      mode: isValidThemeMode(storedMode) ? storedMode : "dark",
+      currency: storedCurrency || "₹",
+      error: null,
+    });
+  }catch{
+  }
+}
     } catch (error) {
-      set({ error: `Failed to load theme: ${error}` });
+      set({ error: `Failed to load theme: ${error instanceof Error ? error.message : String(error)}` });
     } finally {
       set({ isLoading: false });
     }

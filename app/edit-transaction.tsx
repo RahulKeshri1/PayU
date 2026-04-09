@@ -55,9 +55,19 @@ export default function EditTransactionModal() {
       setSelectedCategory(transaction.category);
       setTitle(transaction.title);
       setNote(transaction.note || "");
-      setSelectedDate(new Date(transaction.date));
+      // parse as local date to avoid timezone shift
+        const [year, month, day] = transaction.date.split("-").map(Number);
+        setSelectedDate(new Date(year, month - 1, day));
     }
   }, [transaction]);
+
+  useEffect(() => {
+    const currentCat = getCategoryById(selectedCategory);
+    if (currentCat && currentCat.type !== "both" && currentCat.type !== type) {
+      const validCat = getAllCategories().filter(c => c.type === type || c.type === "both");
+      setSelectedCategory(validCat[0]?.id || "");
+    }
+  }, [type]);
 
   const categories = getAllCategories().filter(
     (cat) => cat.type === type || cat.type === "both",
@@ -110,16 +120,18 @@ export default function EditTransactionModal() {
     router.back();
   };
 
-  const handleDateChange = (event: any, date: Date) => {
-    setShowDatePicker(Platform.OS === "ios");
-    if (date) {
-      setSelectedDate(date);
-    }
-  };
-
-  const handleDismiss = () => {
-    setShowDatePicker(false);
-  };
+  const handleDateChange = (event: any, date?: Date) => {
+      if (Platform.OS === "android") {
+        setShowDatePicker(false);
+      }
+      if (event.type === "dismissed") {
+        setShowDatePicker(false);
+        return;
+      }
+      if (date) {
+        setSelectedDate(date);
+      }
+    };
 
   if (!transaction) {
     return (
@@ -445,8 +457,7 @@ export default function EditTransactionModal() {
                 mode="date"
                 maximumDate={new Date()}
                 display={Platform.OS === "ios" ? "spinner" : "default"}
-                onValueChange={handleDateChange}
-                onDismiss={handleDismiss}
+                onChange={handleDateChange}
               />
             )}
           </View>

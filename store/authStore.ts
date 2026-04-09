@@ -16,6 +16,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isHydrated: boolean;
   error: string | null;
 
   // Actions
@@ -29,6 +30,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  isHydrated: false,
   error: null,
 
   // Load session from storage
@@ -43,7 +45,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       set({ error: `Failed to load session: ${error}` });
     } finally {
-      set({ isLoading: false });
+      set({ isLoading: false, isHydrated: true });
     }
   },
 

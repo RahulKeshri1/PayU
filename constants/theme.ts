@@ -208,6 +208,30 @@ export interface Theme {
 }
 
 export const getTheme = (mode: ThemeMode): Theme => {
+  const shadowColor = mode === "dark" ? "#FFFFFF" : "#000000";
+  const dynamicElevation = {
+    card: {
+      shadowColor,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: mode === "dark" ? 0.05 : 0.12,
+      shadowRadius: 16,
+      elevation: mode === "dark" ? 4 : 8,
+    },
+    floating: {
+      shadowColor,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: mode === "dark" ? 0.1 : 0.16,
+      shadowRadius: 24,
+      elevation: mode === "dark" ? 6 : 12,
+    },
+    pressed: {
+      shadowColor,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: mode === "dark" ? 0.03 : 0.08,
+      shadowRadius: 8,
+      elevation: mode === "dark" ? 2 : 4,
+    },
+  };
   const gradients = {
     light: {
       start: "#F3F4F6", // Light gray start
@@ -229,7 +253,7 @@ export const getTheme = (mode: ThemeMode): Theme => {
     spacing: Spacing,
     borderRadius: BorderRadius,
     typography: Typography,
-    elevation: Elevation,
+    elevation: dynamicElevation,
     animation: Animation,
     opacity: Opacity,
     categoryColors: Colors.categories,

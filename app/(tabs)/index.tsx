@@ -1,3 +1,4 @@
+import { subMonths, subWeeks } from "date-fns";
 import Header from "@/components/Header";
 import { getTheme } from "@/constants/theme";
 import { useHapticFeedback } from "@/hooks/useHaptics";
@@ -69,16 +70,16 @@ export default function HomeScreen() {
     > = {};
 
     const now = new Date();
-    const periodStart = new Date(now);
-    const pastPeriodStart = new Date(now);
+      let periodStart: Date;
+      let pastPeriodStart: Date;
 
-    if (expensePeriod === "weekly") {
-      periodStart.setDate(now.getDate() - 7);
-      pastPeriodStart.setDate(periodStart.getDate() - 7);
-    } else {
-      periodStart.setMonth(now.getMonth() - 1);
-      pastPeriodStart.setMonth(periodStart.getMonth() - 1);
-    }
+      if (expensePeriod === "weekly") {
+        periodStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+        pastPeriodStart = new Date(periodStart.getFullYear(), periodStart.getMonth(), periodStart.getDate() - 7);
+      } else {
+        periodStart = subMonths(now, 1);
+          pastPeriodStart = subMonths(periodStart, 1);
+      }
 
     transactions.forEach((t) => {
       const tDate = new Date(t.timestamp);
@@ -264,9 +265,7 @@ export default function HomeScreen() {
                     color: "rgba(0,0,0,0.55)",
                     marginBottom: 2,
                   }}
-                >
-                  Expired Date
-                </Text>
+                >Expiry Date</Text>
                 <Text
                   style={{
                     fontSize: 14,
@@ -381,11 +380,11 @@ export default function HomeScreen() {
                   padding: theme.spacing.md,
                   marginBottom: theme.spacing.sm,
                   opacity: pressed ? 0.8 : 1,
-                  shadowColor: isDark ? "transparent" : "#000",
+                  shadowColor: isDark ? "#FFFFFF" : "#000",
                   shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: isDark ? 0 : 0.05,
+                  shadowOpacity: isDark ? 0.03 : 0.05,
                   shadowRadius: 8,
-                  elevation: isDark ? 0 : 2,
+                  elevation: isDark ? 1 : 2,
                 })}
               >
                 {/* Category Icon */}
@@ -475,6 +474,9 @@ export default function HomeScreen() {
       {/* ── FAB ── */}
       <Pressable
         onPress={handleAddTransaction}
+        accessibilityRole="button"
+        accessibilityLabel="Add transaction"
+        accessibilityHint="Opens the add transaction screen"
         style={({ pressed }) => ({
           position: "absolute",
           bottom: theme.spacing["2xl"],
@@ -485,9 +487,9 @@ export default function HomeScreen() {
           backgroundColor: isDark ? "#ffffff" : "#0a0a0a",
           justifyContent: "center",
           alignItems: "center",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
+          shadowColor: isDark ? "#FFFFFF" : "#000",
+            shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: isDark ? 0.1 : 0.3,
           shadowRadius: 8,
           elevation: 8,
           opacity: pressed ? 0.85 : 1,

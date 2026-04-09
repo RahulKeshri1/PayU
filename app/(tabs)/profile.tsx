@@ -3,6 +3,8 @@ import { getTheme } from "@/constants/theme";
 import { useHapticFeedback } from "@/hooks/useHaptics";
 import { customAlert } from "@/store/alertStore";
 import { useAuthStore } from "@/store/authStore";
+import { useTransactionStore } from "@/store/transactionStore";
+import { formatCurrency } from "@/utils/formatCurrency";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -29,6 +31,17 @@ export default function ProfileScreen() {
 
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+    const transactions = useTransactionStore((state) => state.transactions);
+    
+    const totalSpendings = transactions
+      .filter((t) => t.type === "expense")
+      .reduce((acc, t) => acc + t.amount, 0);
+
+    const totalIncome = transactions
+      .filter((t) => t.type === "income")
+      .reduce((acc, t) => acc + t.amount, 0);
+
+    const balance = totalIncome - totalSpendings;
 
   const theme = getTheme(themeMode);
   const isDark = themeMode === "dark";
@@ -70,7 +83,8 @@ export default function ProfileScreen() {
       return;
     }
     // TODO: wire up to your auth store / API
-    customAlert("Success", "Details updated successfully");
+    customAlert("Coming Soon", "Feature not implemented");
+//     // TODO: Actually wire up to API and swap this alert
   };
 
   const handleLogout = () => {
@@ -152,7 +166,7 @@ export default function ProfileScreen() {
                 color: isDark ? "#0a0a0a" : "#ffffff",
               }}
             >
-              {user?.fullName?.charAt(0).toUpperCase() ?? "R"}
+              {user?.fullName ? user.fullName.charAt(0).toUpperCase() : "?"}
             </Text>
           </View>
 
@@ -166,7 +180,7 @@ export default function ProfileScreen() {
                       word.slice(1).toLowerCase(),
                   )
                   .join(" ")
-              : "Rahul Kumar Keshri"}
+              : "Unknown User"}
           </Text>
         </View>
 
@@ -195,8 +209,8 @@ export default function ProfileScreen() {
                     borderRadius: 25,
                     alignItems: "center",
                     backgroundColor: isActive ? tabActiveBg : "transparent",
-                    shadowColor: isActive ? "#000" : "transparent",
-                    shadowOpacity: isActive ? 0.1 : 0,
+                    shadowColor: isActive ? (isDark ? "#FFFFFF" : "#000") : "transparent",
+                    shadowOpacity: isActive ? (isDark ? 0.05 : 0.1) : 0,
                     shadowOffset: { width: 0, height: 1 },
                     shadowRadius: 2,
                     elevation: isActive ? 2 : 0,
@@ -222,9 +236,9 @@ export default function ProfileScreen() {
           <View style={{ paddingHorizontal: 16, gap: 12 }}>
             {/* Stats */}
             {[
-              { label: "Total spendings", value: "₹0.00" },
+              { label: "Total spendings", value: formatCurrency(totalSpendings, { currencySymbol: currency }) },
               { label: "Email", value: user?.email ?? "rahulkumarkeshri475@gmail.com" },
-              { label: "Balance", value: "₹0.00" },
+              { label: "Balance", value: formatCurrency(balance, { currencySymbol: currency }) },
             ].map((item, idx, arr) => (
               <View key={item.label}>
                 <View
@@ -475,9 +489,9 @@ export default function ProfileScreen() {
           backgroundColor: isDark ? "#ffffff" : "#000000",
           justifyContent: "center",
           alignItems: "center",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
+          shadowColor: isDark ? "#FFFFFF" : "#000",
+            shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: isDark ? 0.1 : 0.3,
           shadowRadius: 8,
           elevation: 8,
           opacity: pressed ? 0.85 : 1,

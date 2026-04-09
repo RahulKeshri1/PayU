@@ -25,7 +25,7 @@ export const useAlertStore = create<AlertState>((set) => ({
       visible: true,
       title,
       message,
-      buttons: buttons || [{ text: "OK" }],
+      buttons: buttons?.length ? buttons : [{ text: "OK" }],
     }),
   hideAlert: () => set({ visible: false }),
 }));

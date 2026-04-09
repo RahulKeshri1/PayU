@@ -41,6 +41,7 @@ export default function TransactionsScreen() {
   const isDark = themeMode === "dark";
 
   const transactions = useTransactionStore((state) => state.transactions);
+  const loadTransactions = useTransactionStore((s) => s.loadTransactions);
   const deleteTransaction = useTransactionStore((s) => s.deleteTransaction);
   const restoreTransaction = useTransactionStore((s) => s.restoreTransaction);
   const getCategoryById = useCategoryStore((s) => s.getCategoryById);
@@ -59,7 +60,11 @@ export default function TransactionsScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 600);
+    try {
+      await loadTransactions();
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const filtered = transactions
@@ -101,8 +106,12 @@ export default function TransactionsScreen() {
   };
 
   const handleDelete = async (txn: Transaction) => {
-    try {
-      await deleteTransaction(txn.id);
+      if (undoState) {
+        customAlert("Please wait", "You have a pending undo action. Let it expire or undo before deleting another.");
+        return;
+      }
+      try {
+        await deleteTransaction(txn.id);
       haptics.warning();
       setUndoState({ transaction: txn });
       scheduleUndoExpiry();
@@ -172,11 +181,11 @@ export default function TransactionsScreen() {
           padding: 16,
           marginBottom: 8,
           opacity: pressed ? 0.8 : 1,
-          shadowColor: isDark ? "transparent" : "#000",
+          shadowColor: isDark ? "#FFFFFF" : "#000",
           shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: isDark ? 0 : 0.05,
+          shadowOpacity: isDark ? 0.03 : 0.05,
           shadowRadius: 8,
-          elevation: isDark ? 0 : 2,
+          elevation: isDark ? 1 : 2,
         })}
       >
         {/* Category icon bubble */}
@@ -308,12 +317,15 @@ export default function TransactionsScreen() {
 
             return (
               <Pressable
-                key={type}
-                onPress={() => {
-                  haptics.lightTap();
-                  setFilterType(type);
-                }}
-                style={{
+                  key={type}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: isActive }}
+                  accessibilityLabel={`Filter: ${type.charAt(0).toUpperCase() + type.slice(1)}`}
+                  onPress={() => {
+                    haptics.lightTap();
+                    setFilterType(type);
+                  }}
+                  style={{
                   flex: 1,
                   paddingVertical: 7,
                   borderRadius: 25,
@@ -394,11 +406,14 @@ export default function TransactionsScreen() {
 
       {/* ── FAB ── */}
       <Pressable
-        onPress={() => {
-          haptics.mediumTap();
-          router.push("/add-transaction");
-        }}
-        style={({ pressed }) => ({
+          accessibilityRole="button"
+          accessibilityLabel="Add transaction"
+          accessibilityHint="Opens Add Transaction screen"
+          onPress={() => {
+            haptics.mediumTap();
+            router.push("/add-transaction");
+          }}
+          style={({ pressed }) => ({
           position: "absolute",
           bottom: theme.spacing["2xl"],
           right: theme.spacing.lg,
@@ -408,9 +423,9 @@ export default function TransactionsScreen() {
           backgroundColor: isDark ? "#ffffff" : "#000000",
           justifyContent: "center",
           alignItems: "center",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
+          shadowColor: isDark ? "#FFFFFF" : "#000",
+            shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: isDark ? 0.1 : 0.3,
           shadowRadius: 8,
           elevation: 8,
           opacity: pressed ? 0.85 : 1,

@@ -34,10 +34,8 @@ function GradientBarChart({
   isDark: boolean;
   currency: string;
 }) {
-  const bg = isDark ? "#0A0A0A" : "#F2F2F7";
   const gridColor = isDark ? "#2C2C2E" : "#E5E5EA";
   const labelColor = isDark ? "#636366" : "#8E8E93";
-  const textColor = isDark ? "#FFFFFF" : "#000000";
 
   const maxVal = Math.max(...data.flatMap((d) => [d.income, d.expense]), 1);
   const gridLines = Array.from(
@@ -219,8 +217,9 @@ export default function AnalyticsScreen() {
   const getCategoryById = useCategoryStore((state) => state.getCategoryById);
   const transactions = useTransactionStore((state) => state.transactions);
 
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [year, setYear] = useState(new Date().getFullYear());
+  const [now] = useState(() => new Date());
+    const [month, setMonth] = useState(() => now.getMonth() + 1);
+    const [year, setYear] = useState(() => now.getFullYear());
 
   const stats = getMonthlyStats(month, year);
 
@@ -252,39 +251,47 @@ export default function AnalyticsScreen() {
     })
     .sort((a, b) => b.y - a.y);
 
-  // Calculate DailyData for the entire selected month to allow horizontal gliding
-  const dailyDataMap: Record<string, { income: number; expense: number }> = {};
+  // Format date in YYYY-MM-DD using local time
+    const formatDateLocal = (date: Date) => {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    };
 
-  const currentDate = new Date();
-  const isCurrentMonth =
-    month === currentDate.getMonth() + 1 && year === currentDate.getFullYear();
+    // Calculate DailyData for the entire selected month to allow horizontal gliding
+    const dailyDataMap: Record<string, { income: number; expense: number }> = {};
 
-  // If it's the current month, show up to today. Otherwise, show the whole month.
-  const referenceDate = isCurrentMonth ? new Date() : new Date(year, month, 0); // Last day of the selected month
-  referenceDate.setHours(23, 59, 59, 999);
+    // Always show the whole month.
+    const referenceDate = new Date(year, month, 0); // Last day of the selected month
+    referenceDate.setHours(12, 0, 0, 0);
 
-  const daysToMap = referenceDate.getDate(); // Number of days up to the reference date
-  for (let i = daysToMap - 1; i >= 0; i--) {
-    const d = new Date(referenceDate);
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0];
-    dailyDataMap[dateStr] = { income: 0, expense: 0 };
-  }
+    const daysToMap = referenceDate.getDate(); // Number of days up to the reference date
+    for (let i = daysToMap - 1; i >= 0; i--) {
+      const d = new Date(referenceDate.getTime());
+      d.setDate(d.getDate() - i);
+      const dateStr = formatDateLocal(d);
+      dailyDataMap[dateStr] = { income: 0, expense: 0 };
+    }
 
-  transactions.forEach((t) => {
-    const d = new Date(t.timestamp);
-    if (d <= referenceDate) {
-      const dateStr = d.toISOString().split("T")[0];
+    transactions.forEach((t) => {
+      const d = new Date(t.timestamp);
+      const txMonth = d.getMonth() + 1;
+      const txYear = d.getFullYear();
+
+      // Only process transactions belonging to the selected month/year
+      if (txMonth !== month || txYear !== year) return;
+
+      const dateStr = formatDateLocal(d);
       if (dailyDataMap[dateStr]) {
         if (t.type === "income") dailyDataMap[dateStr].income += t.amount;
         if (t.type === "expense") dailyDataMap[dateStr].expense += t.amount;
       }
-    }
-  });
+    });
 
-  const chartData: DailyData[] = Object.entries(dailyDataMap).map(
+    const chartData: DailyData[] = Object.entries(dailyDataMap).map(
     ([iso, v]) => ({
-      x: new Date(iso).getDate().toString(),
+      x: parseInt(iso.split("-")[2], 10).toString(),
       income: v.income,
       expense: v.expense,
     }),
@@ -419,7 +426,7 @@ export default function AnalyticsScreen() {
                 Income & Expense
               </Text>
               <Text style={{ fontSize: 12, color: textSecondary }}>
-                Current Month
+                {month === now.getMonth() + 1 && year === now.getFullYear() ? "Current Month" : new Date(year, month - 1, 1).toLocaleString("default", { month: "long", year: "numeric" })}
               </Text>
             </View>
             <View
@@ -552,9 +559,9 @@ export default function AnalyticsScreen() {
           backgroundColor: isDark ? "#ffffff" : "#000000",
           justifyContent: "center",
           alignItems: "center",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
+          shadowColor: isDark ? "#FFFFFF" : "#000",
+            shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: isDark ? 0.1 : 0.3,
           shadowRadius: 8,
           elevation: 8,
           opacity: pressed ? 0.85 : 1,

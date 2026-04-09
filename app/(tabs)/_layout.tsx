@@ -11,16 +11,17 @@ export default function TabLayout() {
   const router = useRouter();
   const themeMode = useThemeStore((state) => state.mode);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isHydrated = useAuthStore((state) => state.isHydrated);
   const theme = getTheme(themeMode);
 
   // Protect tabs - redirect to sign-in if not authenticated
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isHydrated && !isAuthenticated) {
       router.replace("/sign-in");
     }
-  }, [isAuthenticated, router]);
+  }, [isHydrated, isAuthenticated, router]);
 
-  if (!isAuthenticated) {
+  if (!isHydrated || !isAuthenticated) {
     return null;
   }
 

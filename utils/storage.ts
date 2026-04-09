@@ -38,7 +38,7 @@ export const storage = {
         `Warning: Could not write to storage (${key}):`,
         error instanceof Error ? error.message : error,
       );
-      // App continues with in-memory storage
+      // Serialization failed; value not stored
     }
   },
 

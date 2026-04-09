@@ -68,7 +68,7 @@ export const useHapticFeedback = () => {
   const error = async () => {
     try {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-    } catch (error) {
+    } catch {
       // Haptics not supported or error occurred
     }
   };
